@@ -1,11 +1,11 @@
 package com.example.newsapp.ui.fragment
 
 import android.os.Bundle
-import android.util.Log
 import android.view.*
+import android.view.View.OnClickListener
 import android.widget.Toast
-import androidx.fragment.app.Fragment
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
@@ -13,8 +13,9 @@ import com.example.newsapp.MainActivity
 import com.example.newsapp.R
 import com.example.newsapp.data.entities.Article
 import com.example.newsapp.databinding.FragmentDetailBinding
-import com.example.newsapp.databinding.FragmentFavoritesBinding
 import com.example.newsapp.ui.viewmodel.NewsViewModel
+import com.example.newsapp.util.Constants.Companion.NO_IMAGE
+import com.example.newsapp.util.Constants.Companion.UNKNOWN_SOURCE_RESPONSE
 import com.example.newsapp.util.transition
 
 class DetailFragment : Fragment() {
@@ -53,20 +54,31 @@ class DetailFragment : Fragment() {
             }
         }
 
-
+        // WebView yönlendirmesi
         binding.newsSourceButton.setOnClickListener {
             val pass = DetailFragmentDirections.detailToWebView(article)
             Navigation.transition(it,pass)
         }
 
+        // Detail sayfasındaki back butonu metodları
+        binding.detailToolbar.setNavigationIcon(R.drawable.arrow_back)
+        binding.detailToolbar.setNavigationOnClickListener(object : OnClickListener {
+            override fun onClick(v: View?) {
+                requireActivity().onBackPressed() // Implemented by activity
+            }
+        })
+
+
         return binding.root
     }
 
+
+
     fun setDetailPageContents(article:Article){
-        Glide.with(binding.root).load(article.urlToImage).into(binding.newsImageView)
+        Glide.with(binding.root).load(article.urlToImage?:NO_IMAGE).into(binding.newsImageView)
         binding.titleView.text = article.title
-        binding.authorView.text = article.author
-        binding.dateView.text = article.publishedAt
+        binding.authorView.text = article.author?: UNKNOWN_SOURCE_RESPONSE
+        binding.dateView.text = article.publishedAt?:UNKNOWN_SOURCE_RESPONSE
         binding.descriptionView.text = article.description
     }
 

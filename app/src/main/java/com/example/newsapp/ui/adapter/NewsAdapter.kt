@@ -18,6 +18,7 @@ import com.example.newsapp.ui.fragment.FavoritesFragment
 import com.example.newsapp.ui.fragment.FavoritesFragmentDirections
 import com.example.newsapp.ui.fragment.MainPageFragment
 import com.example.newsapp.ui.fragment.MainPageFragmentDirections
+import com.example.newsapp.util.Constants.Companion.NO_IMAGE
 import com.example.newsapp.util.transition
 
 class NewsAdapter(var mContext:Context,var fragment: Fragment) : RecyclerView.Adapter<NewsAdapter.ArticleViewHolder>() {
@@ -50,7 +51,7 @@ class NewsAdapter(var mContext:Context,var fragment: Fragment) : RecyclerView.Ad
     override fun onBindViewHolder(holder: ArticleViewHolder, position: Int) {
         val article = differ.currentList.get(position)
         holder.binding.apply {
-            Glide.with(this.cardView).load(article.urlToImage).into(this.imageView)
+            Glide.with(this.cardView).load(article.urlToImage?:NO_IMAGE).into(this.imageView)
             this.titleView.text = article.title
             this.descriptionView.text = article.description
             this.cardView.setOnClickListener {
