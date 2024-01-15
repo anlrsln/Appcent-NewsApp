@@ -15,8 +15,11 @@ class NewsViewModel(val repository: NewsRepository) : ViewModel() {
 
     // API'den gelen response'u tutacağımız live data
     val breakingNews: MutableLiveData<Resource<NewsResponse>> = MutableLiveData()
-    val newsPage = 1
-    val searchNewsPage = 1
+    var breakingNewsPage = 1
+    var breakingNewsResponse : NewsResponse? = null
+
+    val searchNews : MutableLiveData<Resource<NewsResponse>> = MutableLiveData()
+    var searchNewsPage = 1
 
 
     //viewmodel nesnesi oluşturulduğunda API'den verileri çekmek için ilk init çalışır
@@ -28,14 +31,14 @@ class NewsViewModel(val repository: NewsRepository) : ViewModel() {
     // breakingNews verilerini almak için kullanılan metot. Asenkron çalıştırmak için CoroutineScope kullanır
     fun getBreakingNews(countryCode:String) = viewModelScope.launch {
         breakingNews.postValue(Resource.Loading())
-        val response = repository.getBreakingNews(countryCode,newsPage)
+        val response = repository.getBreakingNews(countryCode,breakingNewsPage)
         breakingNews.postValue(handleBreakingNewsResponse(response))
     }
     // searchNews verilerini almak için kullanılan metot
     fun getSearchNews(searchQuery:String) = viewModelScope.launch {
-        breakingNews.postValue(Resource.Loading())
+        searchNews.postValue(Resource.Loading())
         val response = repository.searchNews(searchQuery,searchNewsPage)
-        breakingNews.postValue(handleSearchNewsResponse(response))
+        searchNews.postValue(handleSearchNewsResponse(response))
     }
 
 
@@ -44,14 +47,25 @@ class NewsViewModel(val repository: NewsRepository) : ViewModel() {
     private fun handleBreakingNewsResponse(response:Response<NewsResponse>):Resource<NewsResponse>{
         if(response.isSuccessful){
             response.body()?.let {resultResponse ->
-                return Resource.Success(resultResponse)
+                // bir sonraki sayfayı yüklemek için page number arttırma
+                breakingNewsPage++
+                // response'u breakingNewsResponse'a set etme işlemi
+                if(breakingNewsResponse == null){
+                    breakingNewsResponse = resultResponse
+                }else {
+                    // breakingNewsResponse, zaten set edilmişse, yeni dönen response'u
+                    // önceki breakingNewsResponse'a ekleme işlemi
+                    val oldArticles = breakingNewsResponse?.articles
+                    val newArticles = resultResponse.articles
+                    oldArticles?.addAll(newArticles)
+                }
+                return Resource.Success(breakingNewsResponse?:resultResponse)
             }
         }
         return Resource.Error(response.message())
     }
 
-    // response dönüşünü kontrol eder. Başarılı dönerse livedata'ya aktarmak için Resource.Source() cevabını döner,
-    // başarılı değilse Resource.Error(response.message()) mesajını döner
+
     private fun handleSearchNewsResponse(response:Response<NewsResponse>):Resource<NewsResponse>{
         if(response.isSuccessful){
             response.body()?.let {resultResponse ->

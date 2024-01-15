@@ -67,8 +67,6 @@ class DetailFragment : Fragment() {
                 requireActivity().onBackPressed() // Implemented by activity
             }
         })
-
-
         return binding.root
     }
 

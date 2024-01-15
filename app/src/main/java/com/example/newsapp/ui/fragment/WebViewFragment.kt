@@ -37,6 +37,13 @@ class WebViewFragment : Fragment() {
 
         }
 
+        binding.webViewToolbar.setNavigationIcon(R.drawable.arrow_back)
+        binding.webViewToolbar.setNavigationOnClickListener(object : View.OnClickListener {
+            override fun onClick(v: View?) {
+                requireActivity().onBackPressed() // Implemented by activity
+            }
+        })
+
 
         return binding.root
     }
