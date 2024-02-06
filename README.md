@@ -1,5 +1,5 @@
 # NewsApp
-*  It is an Appcent internship project. News App is a simple app that uses NewsAPI to get the breaking news from the world, or you can search for a specific news and add news you like.
+* News App is a simple app that uses NewsAPI to get the breaking news from the world, or you can search for a specific news and add news you like.
 
 # Technologies
 
